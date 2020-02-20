@@ -1,7 +1,9 @@
 import numpy as np
 import math as m
 import numpy.random as random
-
+from Parser import read_in_file
+import Book
+import Library
 
 def run(n_ind, gens, params, p_cross=0, p_mut=0):
     libs = params["libs"]
@@ -161,3 +163,27 @@ def round_robin(p_fit, c_fit, n, q):
             wins[winner] += 1
     most_wins = np.argsort(wins)
     return most_wins[-1:-n-1:-1]
+
+
+def data2params(data):
+    params = dict()
+    params["libs"] = np.array(range(0, len(data.libs)))
+    params["books"] = np.zeros(len(data.libs), len(data.allbooks))
+    params["days"] = data.nbdays
+    params["signup"] = np.zeros_like(params["libs"]).astype(type)
+    params["score"] = np.zeros(len(data.allbooks))
+    for lib in data.libs:
+        booklist = lib.get_best_books()
+        params["signup"][lib.id] = lib.sign_time
+        for i in range(0, len(booklist)):
+            params["books"][lib.id][i] = booklist[i].id
+    for i in range(0, len(data.allbooks)):
+        params["score"][i] = data.allbooks[i].score
+    return params
+
+def main():
+    data = read_in_file("input/a_example.txt")
+    p = data2params(data)
+    return run(50,10000,p)
+
+main()

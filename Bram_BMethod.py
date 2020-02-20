@@ -3,8 +3,8 @@ from Result import *
 
 
 
-def writeOutput(libids,lib_book_dict):
-    with open("output","w+") as output_file:
+def writeOutput(libids,lib_book_dict,outputname):
+    with open(outputname,"w+") as output_file:
         result=""
         result+=str(len(libids))+"\n"
         for key in lib_book_dict:
@@ -32,13 +32,15 @@ def createResultObjects(libs,maxdays):
         lib_id=lib.id 
         best_results=lib.get_best_books(already_read_ids)
         best_results_ids=set(map(lambda x: x.id,best_results))
+        if lib.id not in already_read_ids:
+            beginday+=lib.sign_time
+        beginday+=1
         already_read_ids.update(best_results_ids)
         if lib_id in returnbooks:
             returnbooks[lib_id].update(best_results_ids)
         else:
             returnbooks[lib_id]=best_results_ids
-        beginday+=lib.sign_time
-        beginday+=1
+        
         reSort(temp_libs,already_read_ids)
     return (returnLibs,returnbooks)
 
@@ -52,15 +54,15 @@ def fromInfoGetBestResults(all_libs):
 
 def getSignUpTime(libs):
     return map(lambda x: x.sign_time,libs)
-
+import sys
 if __name__ == "__main__":
-    info_obj=read_in_file("c_incunabula.txt")
+    info_obj=read_in_file(sys.argv[1])
     maxdays=info_obj.nbdays
     all_libs=info_obj.libs
     result=fromInfoGetBestResults(all_libs)
-    print(result)
-    print(info_obj.nbdays)
-    print(list(getSignUpTime(all_libs)))
+    #print(result)
+    #print(info_obj.nbdays)
+    #print(list(getSignUpTime(all_libs)))
     entire_result=createResultObjects(all_libs,maxdays)
     print(entire_result)
-    writeOutput(entire_result[0],entire_result[1])
+    writeOutput(entire_result[0],entire_result[1],sys.argv[2])

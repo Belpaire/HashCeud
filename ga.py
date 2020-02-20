@@ -3,36 +3,61 @@ import math as m
 import numpy.random as random
 
 
-def run(n_ind, gens, p_cross=0, p_mut=0):
-    pop = init_pop(n_ind)
+def run(n_ind, gens, params, p_cross=0, p_mut=0):
+    libs = params["libs"]
+    days = params["days"]
+    books = params["books"] #numpy array
+    signup = params["signup"] #numpy array
+    score = params["score"]
+    pop = init_pop(n_ind, params)
     for g in range(0, gens):
-        p_fit = fitness(pop)
+        p_fit = fitness(pop, params)
         rank = linrank(p_fit)
         # rank = exprank(fit)
         parent_idx = sus(rank, n_ind)
         # parent_idx = tournament(rank, n_ind)
-
-        def get_at_index(popu, idx):
-            #whatever
-            return popu
-
-        parents = get_at_index(pop, parent_idx)
+        parents = pop[parent_idx]
         children = crossover(parents, 1)
         children = mutate(children, 1)
         c_fit = fitness(children)
         new_idx = best_n(p_fit, c_fit, n_ind)
         # new_idx = round_robin(p_fit, c_fit, n_ind, 10)
-        pop = get_at_index([parents, children], new_idx)
+        pop = np.append(parents, children)[new_idx]
     return pop
 
 
-def init_pop(n):
-    population = np.random.rand(n)
+def init_pop(n, params):
+    libs = params["libs"]
+    days = params["days"]
+    population = np.random.randint(-1, days, [n, libs])
     return population
 
 
-def fitness(population):
-    fit = np.zeros_like(population)
+def fitness(population, params):
+    score = params["score"]
+    deadline = params["days"]
+    delay = params["signup"]
+    books = params["books"]
+    fit = np.zeros(population.shape[0])
+    for i in range(0,population.shape[0]):
+        schedule = population[i]
+        order = np.argsort(schedule)
+        prev_end = 0
+        for lib in order:
+            if schedule[lib] < 0:
+                break
+            s_penalty = 0
+            b_penalty = 0
+            ships = schedule[lib]+delay[lib]-deadline
+            if ships < 0:
+                b_penalty = ships
+                ships = 0
+            if schedule[lib] < prev_end:
+                s_penalty = -m.pow(schedule[lib] - prev_end, 2)
+            shipped = books[lib][0:ships]
+            lib_score = score[shipped].sum()+b_penalty+s_penalty
+            fit[i] += lib_score
+            prev_end = schedule[lib]+delay[lib]
     return fit
 
 
@@ -85,12 +110,27 @@ def tournament(ranking, n_sel, size):
 
 
 def crossover(parents, prob):
-    children = parents
+    children = np.array(parents)
+    for i in range(0, parents.shape[0], 2):
+        for j in range(0, parents.shape[1]):
+            if random.rand() > prob:
+                break
+            children[i][j] = parents[i+1][j]
+            children[i+1][j] = parents[i][j]
     return children
 
 
-def mutate(parents, prob):
-    mutated = parents
+def mutate(parents, prob, max):
+    mutated = np.array(parents)
+    for i in range(0, parents.shape[0]):
+        for j in range(0, parents.shape[1]):
+            if random.rand() > prob:
+                break
+            toggle = 1/3
+            if random.rand() > toggle:
+                mutated[i][j] = random.randint(0, max)
+            else:
+                mutated[i][j] = -1
     return mutated
 
 

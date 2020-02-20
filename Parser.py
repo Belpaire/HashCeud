@@ -39,17 +39,13 @@ def read_in_file(file_name):
             all_libs.append(Library(lib_id,books_in_lib,nb_days_sign,nb_per_day))
     return AllInfo(all_libs,nbdays,all_books)
 
-def write_output_file(solution_file_name, slides_list=None):
+def write_output_file(solution_file_name, libs, lib_book_dict):
     with open(solution_file_name, "w") as f:
 
-        if slides_list is None:
-            slides_list = []
-
-        f.write("{}\n".format(len(slides_list)))
-
-        for slide in slides_list:
-            img_ids = [img.id for img in slide.images]
-            f.write(' '.join(map(str,img_ids)) + "\n")
+        f.write("{}\n".format(len(libs)))
+        for key in lib_book_dict:
+            f.write("{} {}\n".format(key,len(lib_book_dict[key])))
+            f.write(" ".join(map(str,lib_book_dict[key])) + "\n")
 
 
 if __name__ == "__main__":

@@ -5,7 +5,7 @@ from Library import Library
 class AllInfo():
     def __init__(self,libs,nbdays,allbooks):
             self.libs=libs
-            self.nbdays=nbdays
+            self.nbdays=int(nbdays)
             self.allbooks=allbooks
 
 def read_in_file(file_name):

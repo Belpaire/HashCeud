@@ -27,6 +27,8 @@ def read_in_file(file_name):
             if not line:
                 break
             split_line=line.strip().split()
+            if len(split_line)==0:
+                break
             nb_books_lib=split_line[0]
             nb_days_sign=split_line[1]
             nb_per_day=split_line[2]
@@ -35,6 +37,7 @@ def read_in_file(file_name):
             for bookid in split_book_ids:
                 books_in_lib.append(all_books[int(bookid)])
             all_libs.append(Library(lib_id,books_in_lib,nb_days_sign,nb_per_day))
+            lib_id+=1
         return AllInfo(all_libs,nbdays,all_books)
 
 def write_output_file(solution_file_name, slides_list=None):

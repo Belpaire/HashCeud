@@ -54,7 +54,7 @@ def getSignUpTime(libs):
     return map(lambda x: x.sign_time,libs)
 
 if __name__ == "__main__":
-    info_obj=read_in_file("a_example.txt")
+    info_obj=read_in_file("c_incunabula.txt")
     maxdays=info_obj.nbdays
     all_libs=info_obj.libs
     result=fromInfoGetBestResults(all_libs)
@@ -62,5 +62,5 @@ if __name__ == "__main__":
     print(info_obj.nbdays)
     print(list(getSignUpTime(all_libs)))
     entire_result=createResultObjects(all_libs,maxdays)
-    print()
+    print(entire_result)
     writeOutput(entire_result[0],entire_result[1])

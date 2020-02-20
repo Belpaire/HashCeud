@@ -2,11 +2,12 @@ import sys
 import os
 import shutil
 from Parser import *
+from BDC_method import getSchedule
 
 def main(filename):
     data = read_in_file('input/{}.txt'.format(filename))
 
-
+    output = getSchedule(data.libs,data.allbooks,data.nbdays)
 
     write_output_file('output/{}.txt'.format(filename), output)
 

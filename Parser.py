@@ -27,6 +27,8 @@ def read_in_file(file_name):
             if not line:
                 break
             split_line=line.strip().split()
+            if len(split_line)==0:
+                break
             nb_books_lib=split_line[0]
             nb_days_sign=split_line[1]
             nb_per_day=split_line[2]
@@ -35,7 +37,7 @@ def read_in_file(file_name):
             for bookid in split_book_ids:
                 books_in_lib.append(all_books[int(bookid)])
             all_libs.append(Library(lib_id,books_in_lib,nb_days_sign,nb_per_day))
-        return AllInfo(all_libs,nbdays,all_books)
+    return AllInfo(all_libs,nbdays,all_books)
 
 def write_output_file(solution_file_name, slides_list=None):
     with open(solution_file_name, "w") as f:
@@ -48,6 +50,10 @@ def write_output_file(solution_file_name, slides_list=None):
         for slide in slides_list:
             img_ids = [img.id for img in slide.images]
             f.write(' '.join(map(str,img_ids)) + "\n")
+
+
 if __name__ == "__main__":
-    all_libs=read_in_file("a_example.txt")
-    print(all_libs)
+    all_info=read_in_file("input/a_example.txt")
+    print(all_info.libs)
+    print(all_info.nbdays)
+    print(all_info.allbooks)

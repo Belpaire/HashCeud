@@ -13,7 +13,7 @@ class Library :
     def scoresOfSignTime(self,already_read):       
         self.books.sort(key=lambda x: mySorter(x,already_read) ,reverse=True)
         return sum(map(lambda x: mySorter(x,already_read),self.books[:self.scan_books]))
-    def get_best_books(self,already_read):
+    def get_best_books(self, already_read):
         self.books.sort(key=lambda x: mySorter(x,already_read),reverse=True)
         return self.books[:self.scan_books]
 

@@ -1,5 +1,6 @@
 from Book import Book
 from Library import Library
+import numpy as np
 #Input reader whaddafak
 
 class AllInfo():
@@ -47,6 +48,65 @@ def write_output_file(solution_file_name, libs, lib_book_dict):
         for key in lib_book_dict:
             f.write("{} {}\n".format(key,len(lib_book_dict[key])))
             f.write(" ".join(map(str,lib_book_dict[key])) + "\n")
+
+
+def read_in_file2(file_name):
+    with open(file_name, "r") as f:
+        data = dict()
+        fl = f.readline()
+        fl = fl.strip().split()
+        nbooks = int(fl[0])
+        nlibs = int(fl[1])
+        days = int(fl[2])
+        data["days"] = days
+        data["libs"] = np.array(range(0, nlibs))
+        data["score"] = np.array(f.readline().strip().split()).astype(int)
+        data["books"] = []
+        data["signup"] = np.zeros_like(data["libs"])
+        data["ships"] = np.zeros_like(data["libs"])
+        data["nbooks"] = nbooks
+        data["totbooks"] = 0
+        data["cumscore"] = []
+        for i in range(0, nlibs):
+            nl = f.readline().strip().split()
+            data["signup"][i] = nl[1]
+            data["ships"][i] = nl[2]
+            nl = np.array(f.readline().strip().split()).astype(int)
+            sort_idx = data["score"][nl].argsort()[::-1]
+            sorted_books = nl[sort_idx]
+            data["books"].append(sorted_books)
+            if data["ships"][i] > sorted_books.size:
+                data["ships"][i] = len(sorted_books)
+            data["totbooks"] += len(sorted_books)
+            data["cumscore"].append(data["score"][sorted_books].cumsum())
+    return data
+
+
+def write_output_file2(file_name, sol, data):
+    with open(file_name, "w") as f:
+        day = 0
+        for i in range(0, sol.size):
+            lib = sol[i]
+            day += data["signup"][lib]
+            if day >= data["days"]:
+                break
+            n_ship = (data["days"]-day)*data["ships"][lib]
+            # with np.errstate(over='raise'):
+            #     try:
+            #         n_ship = (data["days"]-day)*data["ships"][lib]
+            #     except FloatingPointError:
+            #         n_ship = data["books"][lib].size
+            n_ship = min(n_ship, data["books"][lib].size)
+            data["books"][lib] = data["books"][lib][0:n_ship]
+
+        f.write(str(i)+"\n")
+        for j in range(0, i):
+            lib = sol[j]
+            books = data["books"][lib]
+            f.write(str(lib)+" "+str(books.size)+"\n")
+            for book in books:
+                f.write(str(book)+" ")
+            f.write("\n")
 
 
 if __name__ == "__main__":
